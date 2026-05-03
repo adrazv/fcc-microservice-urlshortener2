@@ -12,44 +12,39 @@ app.get('/', (req, res) => {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-// Using a Global Object to avoid memory wipe during rapid tests
-if (!global.urlDatabase) {
-  global.urlDatabase = {};
-  global.currentId = 1;
-}
+const urlDatabase = {};
+let currentId = 1;
 
 app.post('/api/shorturl', (req, res) => {
-  let originalUrl = req.body.url;
+  const originalUrl = req.body.url;
 
-  // TEST 4 HACK: Let's add a simple check to see if it helps the flow
   try {
     const urlObj = new URL(originalUrl);
     if (!/^https?:\/\//.test(originalUrl)) {
       return res.json({ error: 'invalid url' });
     }
+
+    const id = currentId++;
+    urlDatabase[id] = originalUrl;
+
+    return res.json({
+      original_url: originalUrl,
+      short_url: id
+    });
   } catch (err) {
     return res.json({ error: 'invalid url' });
   }
-
-  const id = global.currentId++;
-  global.urlDatabase[id] = originalUrl;
-
-  return res.json({
-    original_url: originalUrl,
-    short_url: id
-  });
 });
 
 app.get('/api/shorturl/:short_url', (req, res) => {
   const id = req.params.short_url;
-  const destination = global.urlDatabase[id];
+  const destination = urlDatabase[id];
 
   if (destination) {
-    // Some test runners fail if there's a delay, 301/302 doesn't matter as much as speed
-    res.writeHead(302, { Location: destination });
+    res.writeHead(301, { Location: destination });
     return res.end();
   } else {
-    return res.json({ error: "No short URL found" });
+    return res.json({ error: "invalid url" });
   }
 });
 
