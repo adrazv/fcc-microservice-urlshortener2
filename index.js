@@ -61,18 +61,8 @@ app.post('/api/shorturl', (req, res) => {
 
 
 
-app.get('/api/shorturl/:short_url', (req, res) => {
-  const id = parseInt(req.params.short_url);
-  const destination = urlDatabase[id];
 
-  if (destination) {
-    res.writeHead(301, { 'Location': destination });
-    res.end();
-  } else {
-    res.json({ error: "No short URL found" });
-  }
-});
-/*
+
 app.get('/api/shorturl/:short_url', (req, res) => {
   const id = parseInt(req.params.short_url);
   const destination = urlDatabase[id];
@@ -83,7 +73,7 @@ app.get('/api/shorturl/:short_url', (req, res) => {
     res.json({ error: "No short URL found" });
   }
 });
-*/
+
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
