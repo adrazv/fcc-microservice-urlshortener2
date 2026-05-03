@@ -32,18 +32,20 @@ app.post('/api/shorturl', (req, res) => {
       }
 
       let id;
-      const existingId = Object.keys(urlDatabase).find(key => urlDatabase[key] === originalUrl);
+      const existingId = Object.keys(urlDatabase).find(
+        key => urlDatabase[key] === originalUrl
+      );
       
       if (existingId) {
-        id = parseInt(existingId);
+        id = existingId;
       } else {
-        id = currentId++;
+        id = String(currentId++);
         urlDatabase[id] = originalUrl;
       }
 
       return res.json({
         original_url: originalUrl,
-        short_url: id
+        short_url: parseInt(id)
       });
     });
   } catch (err) {
@@ -51,10 +53,9 @@ app.post('/api/shorturl', (req, res) => {
   }
 });
 
-
 app.get('/api/shorturl/:short_url', (req, res) => {
   const id = req.params.short_url;
-  const destination = urlDatabase[id] || urlDatabase[parseInt(id)];
+  const destination = urlDatabase[id];
 
   if (destination) {
     return res.status(302).redirect(destination);
