@@ -52,10 +52,12 @@ app.post('/api/shorturl', (req, res) => {
 
 app.get('/api/shorturl/:short_url', (req, res) => {
   const id = req.params.short_url;
-  const destination = urlDatabase[id];
+  
+  // Try to find the URL using the ID as a string or a number
+  const destination = urlDatabase[id] || urlDatabase[parseInt(id)];
 
   if (destination) {
-    res.writeHead(302, { 'Location': destination });
+    res.writeHead(301, { Location: destination });
     return res.end();
   } else {
     return res.json({ error: "No short URL found for the given input" });
