@@ -51,12 +51,13 @@ app.post('/api/shorturl', (req, res) => {
   }
 });
 
+
 app.get('/api/shorturl/:short_url', (req, res) => {
   const id = req.params.short_url;
   const destination = urlDatabase[id] || urlDatabase[parseInt(id)];
 
   if (destination) {
-    return res.redirect(destination);
+    return res.status(302).redirect(destination);
   } else {
     return res.json({ error: "No short URL found" });
   }
