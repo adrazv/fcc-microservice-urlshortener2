@@ -37,15 +37,15 @@ app.post('/api/shorturl', (req, res) => {
       );
       
       if (existingId) {
-        id = existingId;
+        id = parseInt(existingId);
       } else {
-        id = String(currentId++);
+        id = currentId++;
         urlDatabase[id] = originalUrl;
       }
 
       return res.json({
         original_url: originalUrl,
-        short_url: parseInt(id)
+        short_url: id
       });
     });
   } catch (err) {
@@ -54,13 +54,13 @@ app.post('/api/shorturl', (req, res) => {
 });
 
 app.get('/api/shorturl/:short_url', (req, res) => {
-  const id = req.params.short_url;
+  const id = parseInt(req.params.short_url);
   const destination = urlDatabase[id];
 
   if (destination) {
-    return res.status(302).redirect(destination);
+    res.redirect(destination);
   } else {
-    return res.json({ error: "No short URL found" });
+    res.json({ error: "No short URL found" });
   }
 });
 
