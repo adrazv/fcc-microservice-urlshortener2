@@ -8,6 +8,12 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/public', express.static(`${process.cwd()}/public`));
 
+// Request Tracker (Middleware to see logs in Render)
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - ${req.ip}`);
+  next();
+});
+
 app.get('/', (req, res) => {
   res.sendFile(process.cwd() + '/views/index.html');
 });
