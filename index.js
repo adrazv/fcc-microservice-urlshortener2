@@ -24,7 +24,7 @@ app.post('/api/shorturl', (req, res) => {
 
     dns.lookup(urlObj.hostname, (err) => {
       if (err) {
-        return res.json({ error: 'invalid url' });
+        return res.status(400).json({ error: 'invalid url' });
       }
 
       let existingId = null;
@@ -41,13 +41,13 @@ app.post('/api/shorturl', (req, res) => {
         urlDatabase[id] = originalUrl;
       }
 
-      return res.json({
+      return res.status(200).json({
         original_url: originalUrl,
         short_url: id
       });
     });
   } catch (err) {
-    return res.json({ error: 'invalid url' });
+    return res.status(400).json({ error: 'invalid url' });
   }
 });
 
@@ -56,10 +56,10 @@ app.get('/api/shorturl/:short_url', (req, res) => {
   const destination = urlDatabase[id];
 
   if (!destination) {
-    return res.json({ error: "No short URL found" });
+    return res.status(404).json({ error: "No short URL found" });
   }
 
-  res.json({ redirect_url: destination });
+  res.redirect(destination);
 });
 
 const port = process.env.PORT || 3000;
