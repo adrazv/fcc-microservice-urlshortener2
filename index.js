@@ -1,14 +1,23 @@
 const express = require('express');
 const dns = require('dns');
+const path = require('path');
 
 const app = express();
 
 // Middleware para parsear JSON
 app.use(express.json());
 
+// Middleware para servir arquivos estáticos (CSS, JS, imagens)
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Banco de dados em memória
 const urlDatabase = {};
 let currentId = 1;
+
+// Rota GET para servir o HTML principal
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
 
 // Rota POST para criar URL curta
 app.post('/api/shorturl', (req, res) => {
