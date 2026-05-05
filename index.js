@@ -18,15 +18,22 @@ app.get('/', (req, res) => {
 
 app.post('/api/shorturl', (req, res) => {
   const originalUrl = req.body.url;
+  
+  console.log('=== POST /api/shorturl ===');
+  console.log('URL recebida:', originalUrl);
+  console.log('Body completo:', req.body);
 
   try {
     const urlObj = new URL(originalUrl);
+    console.log('URL válida, hostname:', urlObj.hostname);
 
     dns.lookup(urlObj.hostname, (err) => {
       if (err) {
+        console.log('❌ DNS error:', err.message);
         return res.status(400).json({ error: 'invalid url' });
       }
 
+      console.log('✓ DNS OK');
       let existingId = null;
       
       for (let key in urlDatabase) {
@@ -39,6 +46,9 @@ app.post('/api/shorturl', (req, res) => {
       const id = existingId || currentId++;
       if (!existingId) {
         urlDatabase[id] = originalUrl;
+        console.log('Nova URL criada - ID:', id);
+      } else {
+        console.log('URL já existe - ID:', id);
       }
 
       return res.status(200).json({
@@ -47,18 +57,24 @@ app.post('/api/shorturl', (req, res) => {
       });
     });
   } catch (err) {
+    console.log('❌ Erro ao parsear URL:', err.message);
     return res.status(400).json({ error: 'invalid url' });
   }
 });
 
 app.get('/api/shorturl/:short_url', (req, res) => {
   const id = parseInt(req.params.short_url);
+  console.log('=== GET /api/shorturl/:short_url ===');
+  console.log('ID solicitado:', id);
+  
   const destination = urlDatabase[id];
 
   if (!destination) {
+    console.log('❌ ID não encontrado');
     return res.status(404).json({ error: "No short URL found" });
   }
 
+  console.log('✓ Redirecionando para:', destination);
   res.redirect(destination);
 });
 
